@@ -1,8 +1,99 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 
-<svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" onload="initialize()">
+    <script type="text/javascript">
+        var svgNS = "http://www.w3.org/2000/svg";
+        var planetNode = new Array(10);
+        var planetSize = new Array(10);
+        var planetCoords = new Array(10);
+        var planetRotation = new Array(10);
 
-<circle cx="100" cy="50" r="40" stroke="black" stroke-width="2" fill="red"/>
+        var sizeX, sizeY;
 
+        function initialize() {
+            sizeX = window.innerWidth;
+            sizeY = window.innerHeight;
+        
+            for(var i=0; i!=planetNode.length; i++) {
+                planetNode[i] = document.createElementNS(svgNS, 'circle');
+                planetSize[i] = 0.5 + Math.random();
+                planetCoords[i] = new Array(2);
+
+                planetCoords[i][0] = Math.random() * sizeX;
+                planetCoords[i][1] = Math.random() * sizeY;
+
+                planetRotation[i] = Math.random() / 25;
+
+                planetNode[i].setAttribute('r', planetSize[i] + '%');
+                planetNode[i].setAttribute('cx', planetCoords[i][0]);
+                planetNode[i].setAttribute('cy', planetCoords[i][1]);
+                planetNode[i].setAttribute('fill', 'white');
+
+                document.documentElement.appendChild(planetNode[i]);
+
+                window.setInterval('update()', 1000 / 25);
+            }
+        }
+
+        window.onresize = function() {
+            var scaleX = window.innerWidth / sizeX;
+            var scaleY = window.innerHeight / sizeY;
+
+            for(var i=0; i!=planetNode.length; i++) {
+                planetCoords[i][0] *= scaleX;
+                planetCoords[i][1] *= scaleY;
+                planetNode[i].setAttribute('cx', planetCoords[i][0]);
+                planetNode[i].setAttribute('cy', planetCoords[i][1]);
+            }
+
+            sizeX = window.innerWidth;
+            sizeY = window.innerHeight;
+        }
+
+        function update() {
+            var g = Math.PI/180;
+            var sizeXHalf = sizeX/2;
+            var sizeYHalf = sizeY/2;
+            
+            for(var i=0; i!=planetNode.length; i++) {            
+                planetCoords[i][0] -= sizeXHalf;
+                planetCoords[i][1] -= sizeYHalf;
+
+                planetCoords[i][0] = planetCoords[i][0]*Math.cos(g*planetRotation[i]) - planetCoords[i][1]*Math.sin(g*planetRotation[i]);
+                planetCoords[i][1] = planetCoords[i][0]*Math.sin(g*planetRotation[i]) + planetCoords[i][1]*Math.cos(g*planetRotation[i]);
+
+                planetCoords[i][0] += sizeXHalf;
+                planetCoords[i][1] += sizeYHalf;
+
+                planetNode[i].setAttribute('cx', planetCoords[i][0]);
+                planetNode[i].setAttribute('cy', planetCoords[i][1]);
+            }
+        }
+
+        onclick = function(event) {
+            var indicator = document.createElementNS(svgNS, 'circle');
+            indicator.setAttribute('cx', event.x);
+            indicator.setAttribute('cy', event.y);
+            indicator.setAttribute('r', '2%');
+            indicator.setAttribute('stroke', 'red');
+            indicator.setAttribute('stroke-width', '5');
+            document.documentElement.appendChild(indicator);
+        }
+
+        ondblclick = function() {
+            console.debug('double click')
+        }
+
+    </script>
+
+    <defs>
+        <radialGradient id="grey_blue" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" style="stop-color:rgb(255,255,0);stop-opacity:1"/>
+            <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1"/>
+        </radialGradient>
+    </defs>
+    
+    <rect width="100%" height="100%" fill="black" />
+    <circle cx="50%" cy="50%" r="5%" style="fill:url(#grey_blue)" />
 </svg>
