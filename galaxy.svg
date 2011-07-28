@@ -72,7 +72,7 @@
                 planetNode[i].setAttribute('cx', planetCoords[i][0]);
                 planetNode[i].setAttribute('cy', planetCoords[i][1]);
                 planetNode[i].setAttribute('r', planetSize[i]);
-                planetNode[i].setAttribute('fill', 'white');
+                planetNode[i].setAttribute('style', 'fill:url(#gradient_white_grey)');
                 document.documentElement.appendChild(planetNode[i]);
 
                 window.setInterval('update()', 1000 / 25);
@@ -162,6 +162,11 @@
         <radialGradient id="gradient_yellow_red" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
             <stop offset="0%" style="stop-color:rgb(255,255,0);stop-opacity:1"/>
             <stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1"/>
+        </radialGradient>
+
+        <radialGradient id="gradient_white_grey" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1"/>
+            <stop offset="100%" style="stop-color:rgb(128,128,128);stop-opacity:1"/>
         </radialGradient>
     </defs>
     
