@@ -13,61 +13,53 @@ var planetSize = new Array(10);
 var planetCoords = new Array(10);
 var planetRotation = new Array(10);
 
-var sizeX, sizeY, sizeXHalf, sizeYHalf;
+var screenSize, screenSizeHalf;
 
 var selectedPlanets = new Array();
 
 function initialize() {
-    sizeX = window.innerWidth;
-    sizeY = window.innerHeight;
-
-    sizeXHalf = sizeX / 2;
-    sizeYHalf = sizeY / 2;
-
-    var outerCircle = (sizeXHalf > sizeYHalf) ? sizeYHalf : sizeXHalf;
+    screenSize = new Vector2D(window.innerWidth, window.innerHeight);
+    screenSizeHalf = new Vector2D(screenSize.x/2, screenSize.y/2);
+    
+    var outerCircle = (screenSize.x > screenSize.y) ? screenSize.y/2 : screenSize.x/2;
     var innerCircle = outerCircle / 100 * 20;
 
     for(var i=0; i!=gridNode.length; i++) {
-        gridCoords[i] = new Array(2);
-        gridCoords[i][0] = sizeXHalf;
-        gridCoords[i][1] = sizeYHalf;
+        gridCoords[i] = new Vector2D(screenSizeHalf.x, screenSizeHalf.y);
         gridSize[i] = outerCircle / 100 * (25 * (4-i));
 
         gridNode[i] = document.createElementNS(svgNS, 'circle');
-        gridNode[i].setAttribute('cx', gridCoords[i][0]);
-        gridNode[i].setAttribute('cy', gridCoords[i][1]);
+        gridNode[i].setAttribute('cx', gridCoords[i].x);
+        gridNode[i].setAttribute('cy', gridCoords[i].y);
         gridNode[i].setAttribute('r', gridSize[i]);
         gridNode[i].setAttribute('stroke', 'green');
         document.documentElement.appendChild(gridNode[i]);
     }
 
-    sunCoords = new Array(2);
-    sunCoords[0] = sizeXHalf;
-    sunCoords[1] = sizeYHalf;
+    sunCoords = new Vector2D(screenSizeHalf.x, screenSizeHalf.y);;
     sunSize = outerCircle / 100 * 10;
 
     sunNode = document.createElementNS(svgNS, 'circle');
-    sunNode.setAttribute('cx', sunCoords[0]);
-    sunNode.setAttribute('cy', sunCoords[1]);
+    sunNode.setAttribute('cx', sunCoords.x);
+    sunNode.setAttribute('cy', sunCoords.y);
     sunNode.setAttribute('r', sunSize);
     sunNode.setAttribute('style', 'fill:url(#gradient_yellow_red)');
     document.documentElement.appendChild(sunNode);
 
     for(var i=0; i!=planetNode.length; i++) {
-        planetCoords[i] = new Array(2);
-
         var tmpX = Math.random() * (outerCircle - innerCircle) + innerCircle
         var tmpRot = Math.random()*360;
-
-        planetCoords[i][0] = tmpX * Math.cos(tmpRot) + sizeXHalf;
-        planetCoords[i][1] = tmpX * Math.sin(tmpRot) + sizeYHalf;
-
+        
+        planetCoords[i] = new Vector2D(tmpX, 0);
+        planetCoords[i].rotate(tmpRot);
+        planetCoords[i].translate(screenSizeHalf);
+        
         planetSize[i] = Math.random() * (outerCircle / 80) + (outerCircle / 80);
         planetRotation[i] = Math.random() / 25;
 
         planetNode[i] = document.createElementNS(svgNS, 'circle');
-        planetNode[i].setAttribute('cx', planetCoords[i][0]);
-        planetNode[i].setAttribute('cy', planetCoords[i][1]);
+        planetNode[i].setAttribute('cx', planetCoords[i].x);
+        planetNode[i].setAttribute('cy', planetCoords[i].y);
         planetNode[i].setAttribute('r', planetSize[i]);
         planetNode[i].setAttribute('style', 'fill:url(#gradient_white_grey)');
         document.documentElement.appendChild(planetNode[i]);
@@ -77,65 +69,53 @@ function initialize() {
 }
 
 window.onresize = function() {
-    var scaleX = window.innerWidth / sizeX;
-    var scaleY = window.innerHeight / sizeY;
-
-    var maxScale = (window.innerWidth > window.innerHeight) ? scaleY : scaleX;
-
+    var oldScreenSize = new Vector2D(screenSize.x, screenSize.y);
+    var oldScreenSizeHalf = new Vector2D(screenSizeHalf.x, screenSizeHalf.y);
+    screenSize.x = window.innerWidth;
+    screenSize.y = window.innerHeight;
+    screenSizeHalf = new Vector2D(screenSize.x/2, screenSize.y/2);
+    
+    var scale = new Vector2D(window.innerWidth, window.innerHeight);
+    scale.div(oldScreenSize);
+    var maxScale = (window.innerWidth > window.innerHeight) ? scale.y : scale.x;
+    
     for(var i=0; i!=gridNode.length; i++) {
-        gridCoords[i][0] *= scaleX;
-        gridCoords[i][1] *= scaleY;
+        gridCoords[i].scale(scale);
         gridSize[i] *= maxScale;
 
-        gridNode[i].setAttribute('cx', gridCoords[i][0]);
-        gridNode[i].setAttribute('cy', gridCoords[i][1]);
+        gridNode[i].setAttribute('cx', gridCoords[i].x);
+        gridNode[i].setAttribute('cy', gridCoords[i].y);
         gridNode[i].setAttribute('r', gridSize[i]);
     }
 
-    sunCoords[0] *= scaleX;
-    sunCoords[1] *= scaleY;
+    sunCoords.scale(scale);
     sunSize *= maxScale;
 
-    sunNode.setAttribute('cx', sunCoords[0]);
-    sunNode.setAttribute('cy', sunCoords[1]);
+    sunNode.setAttribute('cx', sunCoords.x);
+    sunNode.setAttribute('cy', sunCoords.y);
     sunNode.setAttribute('r', sunSize);
 
     for(var i=0; i!=planetNode.length; i++) {
-        planetCoords[i][0] -= sizeXHalf;
-        planetCoords[i][1] -= sizeYHalf;
-        planetCoords[i][0] *= maxScale;
-        planetCoords[i][1] *= maxScale;
+        planetCoords[i].itranslate(oldScreenSizeHalf);
+        planetCoords[i].x *= maxScale;
+        planetCoords[i].y *= maxScale;
         planetSize[i] *= maxScale;
-        planetCoords[i][0] += window.innerWidth/2;
-        planetCoords[i][1] += window.innerHeight/2;
+        planetCoords[i].translate(screenSizeHalf);
 
-        planetNode[i].setAttribute('cx', planetCoords[i][0]);
-        planetNode[i].setAttribute('cy', planetCoords[i][1]);
+        planetNode[i].setAttribute('cx', planetCoords[i].x);
+        planetNode[i].setAttribute('cy', planetCoords[i].y);
         planetNode[i].setAttribute('r', planetSize[i]);
     }
-
-    sizeX = window.innerWidth;
-    sizeY = window.innerHeight;
-
-    sizeXHalf = sizeX / 2;
-    sizeYHalf = sizeY / 2;
 }
 
 function update() {
-    var g = Math.PI/180;
-
     for(var i=0; i!=planetNode.length; i++) {
-        planetCoords[i][0] -= sizeXHalf;
-        planetCoords[i][1] -= sizeYHalf;
+        planetCoords[i].itranslate(screenSizeHalf);
+        planetCoords[i].rotate(planetRotation[i]);
+        planetCoords[i].translate(screenSizeHalf);
 
-        planetCoords[i][0] = planetCoords[i][0]*Math.cos(g*planetRotation[i]) - planetCoords[i][1]*Math.sin(g*planetRotation[i]);
-        planetCoords[i][1] = planetCoords[i][0]*Math.sin(g*planetRotation[i]) + planetCoords[i][1]*Math.cos(g*planetRotation[i]);
-
-        planetCoords[i][0] += sizeXHalf;
-        planetCoords[i][1] += sizeYHalf;
-
-        planetNode[i].setAttribute('cx', planetCoords[i][0]);
-        planetNode[i].setAttribute('cy', planetCoords[i][1]);
+        planetNode[i].setAttribute('cx', planetCoords[i].x);
+        planetNode[i].setAttribute('cy', planetCoords[i].y);
     }
 }
 
