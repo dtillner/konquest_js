@@ -36,7 +36,7 @@ function initialize() {
         document.documentElement.appendChild(gridNode[i]);
     }
 
-    sunCoords = new Vector2D(screenSizeHalf.x, screenSizeHalf.y);;
+    sunCoords = new Vector2D(screenSizeHalf.x, screenSizeHalf.y);
     sunSize = outerCircle / 100 * 10;
 
     sunNode = document.createElementNS(svgNS, 'circle');
@@ -47,7 +47,7 @@ function initialize() {
     document.documentElement.appendChild(sunNode);
 
     for(var i=0; i!=planetNode.length; i++) {
-        var tmpX = Math.random() * (outerCircle - innerCircle) + innerCircle
+        var tmpX = Math.random() * (outerCircle - innerCircle) + innerCircle;
         var tmpRot = Math.random()*360;
         
         planetCoords[i] = new Vector2D(tmpX, 0);
@@ -55,7 +55,7 @@ function initialize() {
         planetCoords[i].translate(screenSizeHalf);
         
         planetSize[i] = Math.random() * (outerCircle / 80) + (outerCircle / 80);
-        planetRotation[i] = Math.random() / 25;
+        planetRotation[i] = Math.random() / 3;
 
         planetNode[i] = document.createElementNS(svgNS, 'circle');
         planetNode[i].setAttribute('cx', planetCoords[i].x);
@@ -63,9 +63,9 @@ function initialize() {
         planetNode[i].setAttribute('r', planetSize[i]);
         planetNode[i].setAttribute('style', 'fill:url(#gradient_white_grey)');
         document.documentElement.appendChild(planetNode[i]);
-
-        window.setInterval('update()', 1000 / 25);
     }
+
+    window.setInterval('update()', 1000 / 25);
 }
 
 window.onresize = function() {
